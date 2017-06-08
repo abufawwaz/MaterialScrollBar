@@ -159,19 +159,19 @@ public abstract class MaterialScrollBar<T> extends RelativeLayout {
     //Sets up bar.
     View setUpHandleTrack(Context context){
         handleTrack = new View(context);
-        LayoutParams lp = new RelativeLayout.LayoutParams(Utils.getDP(12, this), LayoutParams.MATCH_PARENT);
+        LayoutParams lp = new RelativeLayout.LayoutParams(Utils.getDP(6, this), LayoutParams.MATCH_PARENT);
         lp.addRule(ALIGN_PARENT_RIGHT);
         handleTrack.setLayoutParams(lp);
         handleTrack.setBackgroundColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-        ViewCompat.setAlpha(handleTrack, 0.4F);
+        ViewCompat.setAlpha(handleTrack, 0.0F);
         return(handleTrack);
     }
 
     //Sets up handleThumb.
     Handle setUpHandle(Context context, Boolean lightOnTouch){
         handleThumb = new Handle(context, getMode());
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(Utils.getDP(12, this),
-                Utils.getDP(72, this));
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(Utils.getDP(6, this),
+                Utils.getDP(56, this));
         lp.addRule(ALIGN_PARENT_RIGHT);
         handleThumb.setLayoutParams(lp);
 
@@ -234,7 +234,6 @@ public abstract class MaterialScrollBar<T> extends RelativeLayout {
 
     //General setup.
     private void generalSetup(){
-        recyclerView.setVerticalScrollBarEnabled(false); // disable any existing scrollbars
         recyclerView.addOnScrollListener(new scrollListener()); // lets us read when the recyclerView scrolls
 
         setTouchIntercept(); // catches touches on the bar
@@ -724,7 +723,7 @@ public abstract class MaterialScrollBar<T> extends RelativeLayout {
                 currentScrollPercent == 0 || currentScrollPercent == 1) {
             previousScrollPercent = currentScrollPercent;
             scrollUtils.scrollToPositionAtProgress(currentScrollPercent);
-            scrollUtils.scrollHandleAndIndicator();
+            scrollUtils.scrollHandleAndIndicator(recyclerView);
             recyclerView.onScrolled(0, 0);
         }
 
@@ -762,7 +761,7 @@ public abstract class MaterialScrollBar<T> extends RelativeLayout {
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
-            scrollUtils.scrollHandleAndIndicator();
+            scrollUtils.scrollHandleAndIndicator(recyclerView);
             if(dy != 0){
                 onScroll();
             }

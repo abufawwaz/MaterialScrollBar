@@ -19,6 +19,7 @@ package com.turingtechnologies.materialscrollbar;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
@@ -50,7 +51,7 @@ class ScrollingUtilities {
         private int rowHeight;
     }
 
-    void scrollHandleAndIndicator(){
+    void scrollHandleAndIndicator(RecyclerView recyclerView) {
         int scrollBarY;
         getCurScrollState();
         if(customScroller != null){
@@ -58,7 +59,9 @@ class ScrollingUtilities {
         } else {
             constant = scrollPosState.rowHeight * scrollPosState.rowIndex;
         }
-        scrollBarY = (int) getScrollPosition();
+        recyclerView.getVerticalScrollbarPosition();
+        scrollBarY = (int) (((float) recyclerView.computeVerticalScrollOffset() / (float) recyclerView.computeVerticalScrollRange())
+                * getAvailableScrollBarHeight());
         ViewCompat.setY(materialScrollBar.handleThumb, scrollBarY);
         materialScrollBar.handleThumb.invalidate();
         if(materialScrollBar.indicator != null){
@@ -70,7 +73,7 @@ class ScrollingUtilities {
             }
             materialScrollBar.indicator.setText(element);
 
-            materialScrollBar.indicator.setScroll(scrollBarY + materialScrollBar.getTop());
+            materialScrollBar.indicator.setScroll(scrollBarY);
         }
     }
 

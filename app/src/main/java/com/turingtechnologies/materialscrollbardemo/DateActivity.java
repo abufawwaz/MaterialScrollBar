@@ -19,7 +19,9 @@ public class DateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_others);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setAdapter(new DemoAdapter(this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(manager);
         ((TouchScrollBar) findViewById(R.id.touchScrollBar)).setIndicator(new DateAndTimeIndicator(this, false, true, true, true), true);
     }
 
