@@ -140,7 +140,9 @@ public abstract class Indicator<T, U extends Indicator> extends RelativeLayout{
             }
             newText = getTextElement(section, adapter);
         } catch (ArrayIndexOutOfBoundsException e){
-            newText = "Error";
+            newText = "";
+        } catch (StringIndexOutOfBoundsException e) {
+            newText = "";
         }
         if (!textView.getText().equals(newText)){
             textView.setText(newText);

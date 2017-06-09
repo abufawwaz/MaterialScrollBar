@@ -71,8 +71,8 @@ class ScrollingUtilities {
             } else {
                 element = scrollPosState.rowIndex;
             }
-            materialScrollBar.indicator.setText(element);
 
+            materialScrollBar.indicator.setText(element);
             materialScrollBar.indicator.setScroll(scrollBarY);
         }
     }
