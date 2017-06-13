@@ -64,31 +64,36 @@ public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar>{
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(!hiddenByUser) {
-                    //On Down
-                    if (event.getAction() != MotionEvent.ACTION_UP) {
+                try {
+                    if(!hiddenByUser) {
+                        //On Down
+                        if (event.getAction() != MotionEvent.ACTION_UP) {
 
-                        if(!hidden || respondToTouch){
-                            onDown(event);
+                            if(!hidden || respondToTouch){
+                                onDown(event);
 
-                            if(hide){
+                                if(hide){
+                                    uiHandler.removeCallbacks(fadeBar);
+                                    fadeIn();
+                                }
+                            }
+
+                            //On Up
+                        } else {
+
+                            onUp();
+
+                            if (hide) {
                                 uiHandler.removeCallbacks(fadeBar);
-                                fadeIn();
+                                uiHandler.postDelayed(fadeBar, hideDuration);
                             }
                         }
-
-                    //On Up
-                    } else {
-
-                        onUp();
-
-                        if (hide) {
-                            uiHandler.removeCallbacks(fadeBar);
-                            uiHandler.postDelayed(fadeBar, hideDuration);
-                        }
+                        return true;
                     }
-                    return true;
+                } catch (ArithmeticException e) {
+                    // divide by zero
                 }
+
                 return false;
             }
         });

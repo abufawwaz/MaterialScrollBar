@@ -49,31 +49,35 @@ public class DateAndTimeIndicator extends Indicator<IDateableAdapter, DateAndTim
 
     @Override
     protected String getTextElement(Integer currentSection, IDateableAdapter adapter) {
-        Date date = adapter.getDateForElement(currentSection);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        String text = "";
-        if(includeTime){
-            text += DateFormat.getTimeFormat(context).format(date);
-        }
-        if(includeMonth){
-            text += " " + months[calendar.get(Calendar.MONTH)].substring(0, 3);
-        }
-        if(includeDay){
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            if(String.valueOf(day).length() == 1){
-                text += " 0" + day;
-            } else {
-                text += " " + day;
+        try {
+            Date date = adapter.getDateForElement(currentSection);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            String text = "";
+            if (includeTime) {
+                text += DateFormat.getTimeFormat(context).format(date);
             }
-        }
-        if(includeYear){
-            if(includeDay){
-                text += ",";
+            if (includeMonth) {
+                text += " " + months[calendar.get(Calendar.MONTH)].substring(0, 3);
             }
-            text += " " + calendar.get(Calendar.YEAR);
+            if (includeDay) {
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                if (String.valueOf(day).length() == 1) {
+                    text += " 0" + day;
+                } else {
+                    text += " " + day;
+                }
+            }
+            if (includeYear) {
+                if (includeDay) {
+                    text += ",";
+                }
+                text += " " + calendar.get(Calendar.YEAR);
+            }
+            return text.trim();
+        } catch (StringIndexOutOfBoundsException e) {
+            return "";
         }
-        return text.trim();
     }
 
     @Override
