@@ -295,15 +295,21 @@ public abstract class MaterialScrollBar<T> extends RelativeLayout {
             throw new RuntimeException("You need to set a recyclerView for the scroll bar, either in the XML or using setRecyclerView().");
         }
 
-        if(sizeUnchecked && !isInEditMode()){
+        if(sizeUnchecked && !isInEditMode()) {
             scrollUtils.getCurScrollState();
-            if(scrollUtils.getAvailableScrollHeight() <= 0){
+
+            try {
+                if(scrollUtils.getAvailableScrollHeight() <= 0){
+                    handleTrack.setVisibility(GONE);
+                    handleThumb.setVisibility(GONE);
+                } else {
+                    handleTrack.setVisibility(VISIBLE);
+                    handleThumb.setVisibility(VISIBLE);
+                    sizeUnchecked = false;
+                }
+            } catch (Exception e) {
                 handleTrack.setVisibility(GONE);
                 handleThumb.setVisibility(GONE);
-            } else {
-                handleTrack.setVisibility(VISIBLE);
-                handleThumb.setVisibility(VISIBLE);
-                sizeUnchecked = false;
             }
         }
     }
