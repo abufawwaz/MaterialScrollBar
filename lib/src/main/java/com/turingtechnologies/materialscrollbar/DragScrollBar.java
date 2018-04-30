@@ -1,5 +1,5 @@
 /*
- *  Copyright © 2016, Turing Technologies, an unincorporated organisation of Wynne Plaga
+ *  Copyright © 2016-2018, Turing Technologies, an unincorporated organisation of Wynne Plaga
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,51 +17,42 @@
 package com.turingtechnologies.materialscrollbar;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 
 public class DragScrollBar extends MaterialScrollBar<DragScrollBar>{
 
-    Boolean draggableFromAnywhere = false;
     float handleOffset = 0;
     float indicatorOffset = 0;
 
-    public DragScrollBar(Context context, AttributeSet attributeSet, int defStyle){
+    public DragScrollBar(Context context, AttributeSet attributeSet, int defStyle) {
         super(context, attributeSet, defStyle);
     }
 
-    public DragScrollBar(Context context, AttributeSet attributeSet){
+    public DragScrollBar(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
     }
 
-    public DragScrollBar(Context context, RecyclerView recyclerView, boolean lightOnTouch){
+    public DragScrollBar(Context context, RecyclerView recyclerView, boolean lightOnTouch) {
         super(context, recyclerView, lightOnTouch);
     }
 
     boolean held = false;
 
-    public DragScrollBar setDraggableFromAnywhere(boolean draggableFromAnywhere){
-        this.draggableFromAnywhere = draggableFromAnywhere;
-        return this;
-    }
-
-    //Tests to ensure that the touch is on the handleThumb depending on the user preference
-    private boolean validTouch(MotionEvent event){
-        return draggableFromAnywhere || (event.getY() >= ViewCompat.getY(handleThumb) - Utils.getDP(20, recyclerView.getContext()) && event.getY() <= ViewCompat.getY(handleThumb) + handleThumb.getHeight());
-    }
-
     @Override
     void setTouchIntercept() {
         final Handle handle = super.handleThumb;
-        OnTouchListener otl = new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-            if (!hiddenByUser) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN && validTouch(event)){
+        OnTouchListener otl = (v, event) -> {
+            if(!hiddenByUser) {
+                boolean valid = validTouch(event);
+
+                // check valid touch region only on action down => otherwise the check will fail if users scrolls very fast
+                if(event.getAction() == MotionEvent.ACTION_DOWN && !valid) {
+                    return false;
+                }
+
+                if(event.getAction() == MotionEvent.ACTION_DOWN && valid) {
                     held = true;
 
                     indicatorOffset = event.getY() - handle.getY() - handle.getLayoutParams().height / 2;
@@ -70,10 +61,10 @@ public class DragScrollBar extends MaterialScrollBar<DragScrollBar>{
                     handleOffset = (offset2 * balance) + (indicatorOffset * (1 - balance));
                 }
                 //On Down
-                if ((event.getAction() == MotionEvent.ACTION_MOVE || event.getAction() == MotionEvent.ACTION_DOWN) && held) {
+                if((event.getAction() == MotionEvent.ACTION_MOVE || event.getAction() == MotionEvent.ACTION_DOWN) && held) {
                     onDown(event);
                     fadeIn();
-                //On Up
+                    //On Up
                 } else {
                     onUp();
 
@@ -81,10 +72,10 @@ public class DragScrollBar extends MaterialScrollBar<DragScrollBar>{
 
                     fadeOut();
                 }
+                performClick();
                 return true;
             }
             return false;
-            }
         };
         setOnTouchListener(otl);
     }
@@ -108,15 +99,15 @@ public class DragScrollBar extends MaterialScrollBar<DragScrollBar>{
     }
 
     @Override
-    void implementFlavourPreferences(TypedArray a) {}
+    void implementFlavourPreferences() {}
 
     @Override
-    float getHandleOffset(){
+    float getHandleOffset() {
         return draggableFromAnywhere ? 0 : handleOffset;
     }
 
     @Override
-    float getIndicatorOffset(){
+    float getIndicatorOffset() {
         return draggableFromAnywhere ? 0 : indicatorOffset;
     }
 }

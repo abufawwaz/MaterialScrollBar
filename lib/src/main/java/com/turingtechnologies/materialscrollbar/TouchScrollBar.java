@@ -1,5 +1,5 @@
 /*
- *  Copyright © 2016, Turing Technologies, an unincorporated organisation of Wynne Plaga
+ *  Copyright © 2016-2018, Turing Technologies, an unincorporated organisation of Wynne Plaga
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,74 +23,81 @@ import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
-public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar>{
+public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar> {
 
     private boolean hide = true;
     private int hideDuration = 2500;
     private Handler uiHandler = new Handler(Looper.getMainLooper());
     private boolean respondToTouch = true;
+    private TypedArray flavourAttributes;
 
-    private Runnable fadeBar = new Runnable() {
+    private Runnable fadeBar = this::fadeOut;
 
-        @Override
-        public void run() {
-            fadeOut();
-        }
-    };
-
-    public TouchScrollBar(Context context, AttributeSet attributeSet){
+    public TouchScrollBar(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
     }
 
-    public TouchScrollBar(Context context, AttributeSet attributeSet, int defStyle){
+    public TouchScrollBar(Context context, AttributeSet attributeSet, int defStyle) {
         super(context, attributeSet, defStyle);
     }
 
-    public TouchScrollBar(Context context, RecyclerView recyclerView, boolean lightOnTouch){
+    public TouchScrollBar(Context context, RecyclerView recyclerView, boolean lightOnTouch) {
         super(context, recyclerView, lightOnTouch);
     }
 
-    public TouchScrollBar setHideDuration(int duration){
+    public TouchScrollBar setHideDuration(int duration) {
         hideDuration = duration;
         return this;
     }
 
     @Override
+    void setUpProps(Context context, AttributeSet attributes) {
+        super.setUpProps(context, attributes);
+        flavourAttributes = context.getTheme().obtainStyledAttributes(
+                attributes, R.styleable.TouchScrollBar, 0, 0);
+    }
+
+    @Override
     void setTouchIntercept() {
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(!hiddenByUser) {
-                    //On Down
-                    if (event.getAction() != MotionEvent.ACTION_UP) {
+        setOnTouchListener((v, event) -> {
+            if(!hiddenByUser) {
 
-                        if(!hidden || respondToTouch){
-                            onDown(event);
+                boolean valid = validTouch(event);
 
-                            if(hide){
-                                uiHandler.removeCallbacks(fadeBar);
-                                fadeIn();
-                            }
-                        }
+                // check valid touch region only on action down => otherwise the check will fail if users scrolls very fast
+                if(event.getAction() == MotionEvent.ACTION_DOWN && !valid) {
+                    return false;
+                }
 
-                    //On Up
-                    } else {
+                //On Down
+                if(event.getAction() != MotionEvent.ACTION_UP) {
 
-                        onUp();
+                    if(!hidden || respondToTouch) {
+                        onDown(event);
 
-                        if (hide) {
+                        if(hide) {
                             uiHandler.removeCallbacks(fadeBar);
-                            uiHandler.postDelayed(fadeBar, hideDuration);
+                            fadeIn();
                         }
                     }
-                    return true;
+
+                    //On Up
+                } else {
+
+                    onUp();
+
+                    if(hide) {
+                        uiHandler.removeCallbacks(fadeBar);
+                        uiHandler.postDelayed(fadeBar, hideDuration);
+                    }
                 }
-                return false;
+                performClick();
+                return true;
             }
+            return false;
         });
     }
 
@@ -106,7 +113,7 @@ public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar>{
 
     @Override
     void onScroll() {
-        if(hide){
+        if(hide) {
             uiHandler.removeCallbacks(fadeBar);
             uiHandler.postDelayed(fadeBar, hideDuration);
             fadeIn();
@@ -120,22 +127,22 @@ public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar>{
     }
 
     @Override
-    void implementFlavourPreferences(TypedArray a) {
-        if(a.hasValue(R.styleable.TouchScrollBar_msb_autoHide)){
-            setAutoHide(a.getBoolean(R.styleable.TouchScrollBar_msb_autoHide, true));
+    void implementFlavourPreferences() {
+        if(flavourAttributes.hasValue(R.styleable.TouchScrollBar_msb_autoHide)) {
+            setAutoHide(flavourAttributes.getBoolean(R.styleable.TouchScrollBar_msb_autoHide, true));
         }
-        if(a.hasValue(R.styleable.TouchScrollBar_msb_hideDelayInMilliseconds)){
-            hideDuration = (a.getInteger(R.styleable.TouchScrollBar_msb_hideDelayInMilliseconds, 2500));
+        if(flavourAttributes.hasValue(R.styleable.TouchScrollBar_msb_hideDelayInMilliseconds)) {
+            hideDuration = (flavourAttributes.getInteger(R.styleable.TouchScrollBar_msb_hideDelayInMilliseconds, 2500));
         }
     }
 
     @Override
-    float getHandleOffset(){
+    float getHandleOffset() {
         return 0;
     }
 
     @Override
-    float getIndicatorOffset(){
+    float getIndicatorOffset() {
         return 0;
     }
 
@@ -144,10 +151,10 @@ public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar>{
      * should hide after a period of inactivity or not.
      * @param hide sets whether the bar should hide or not.
      *
-     * This method is experimental
+     *             This method is experimental
      */
-    public TouchScrollBar setAutoHide(Boolean hide){
-        if(!hide){
+    public TouchScrollBar setAutoHide(Boolean hide) {
+        if(!hide) {
             TranslateAnimation anim = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f,
                     Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
             anim.setFillAfter(true);
@@ -163,7 +170,7 @@ public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar>{
     /**
      * @param respondToTouchIfHidden Should the bar pop out and scroll if it is hidden?
      */
-    public TouchScrollBar setRespondToTouchIfHidden(boolean respondToTouchIfHidden){
+    public TouchScrollBar setRespondToTouchIfHidden(boolean respondToTouchIfHidden) {
         respondToTouch = respondToTouchIfHidden;
         return this;
     }

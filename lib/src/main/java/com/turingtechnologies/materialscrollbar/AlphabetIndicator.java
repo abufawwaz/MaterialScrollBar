@@ -1,5 +1,5 @@
 /*
- *  Copyright © 2016, Turing Technologies, an unincorporated organisation of Wynne Plaga
+ *  Copyright © 2016-2018, Turing Technologies, an unincorporated organisation of Wynne Plaga
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import android.content.Context;
 @SuppressLint("ViewConstructor")
 public class AlphabetIndicator extends Indicator<INameableAdapter, AlphabetIndicator>{
 
-    public AlphabetIndicator (Context c){
+    public AlphabetIndicator (Context c) {
         super(c, INameableAdapter.class);
     }
 

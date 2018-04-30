@@ -1,5 +1,5 @@
 /*
- *  Copyright © 2016, Turing Technologies, an unincorporated organisation of Wynne Plaga
+ *  Copyright © 2016-2018, Turing Technologies, an unincorporated organisation of Wynne Plaga
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class CustomIndicator extends Indicator<ICustomAdapter, CustomIndicator> 
 
     private int textSize = 25;
 
-    public CustomIndicator(Context context){
+    public CustomIndicator(Context context) {
         super(context, ICustomAdapter.class);
     }
 
@@ -36,13 +36,13 @@ public class CustomIndicator extends Indicator<ICustomAdapter, CustomIndicator> 
     protected String getTextElement(Integer currentSection, ICustomAdapter adapter) {
         String text = adapter.getCustomStringForElement(currentSection);
         LayoutParams layoutParams = (LayoutParams) getLayoutParams();
-        if(layoutParams == null){
+        if(layoutParams == null) {
             return "";
         }
         Paint paint = new Paint();
         paint.setTextSize(textSize);
         int width = Utils.getDP((int) paint.measureText(text), context) + Utils.getDP(30, context);
-        if(width < Utils.getDP(75, context)){
+        if(width < Utils.getDP(75, context)) {
             width = Utils.getDP(75, context);
         }
         layoutParams.width = width;
@@ -65,7 +65,7 @@ public class CustomIndicator extends Indicator<ICustomAdapter, CustomIndicator> 
         return textSize;
     }
 
-    public CustomIndicator setTextSize(int textSize){
+    public CustomIndicator setTextSize(int textSize) {
         this.textSize = textSize;
         return this;
     }
