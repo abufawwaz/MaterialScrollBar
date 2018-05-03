@@ -56,8 +56,12 @@ public class TouchScrollBar extends MaterialScrollBar<TouchScrollBar> {
     @Override
     void setUpProps(Context context, AttributeSet attributes) {
         super.setUpProps(context, attributes);
-        flavourAttributes = context.getTheme().obtainStyledAttributes(
-                attributes, R.styleable.TouchScrollBar, 0, 0);
+        try {
+            flavourAttributes = context.getTheme().obtainStyledAttributes(
+                    attributes, R.styleable.TouchScrollBar, 0, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

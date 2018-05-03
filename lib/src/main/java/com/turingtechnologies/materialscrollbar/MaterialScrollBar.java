@@ -227,35 +227,39 @@ public abstract class MaterialScrollBar<T> extends RelativeLayout {
 
     //General setup.
     private void generalSetup() {
-        recyclerView.setVerticalScrollBarEnabled(false); // disable any existing scrollbars
-        recyclerView.addOnScrollListener(new ScrollListener()); // lets us read when the recyclerView scrolls
+        try {
+            recyclerView.setVerticalScrollBarEnabled(false); // disable any existing scrollbars
+            recyclerView.addOnScrollListener(new ScrollListener()); // lets us read when the recyclerView scrolls
 
-        implementPreferences();
+            implementPreferences();
 
-        implementFlavourPreferences();
+            implementFlavourPreferences();
 
-        a.recycle();
+            a.recycle();
 
-        setTouchIntercept(); // catches touches on the bar
+            setTouchIntercept(); // catches touches on the bar
 
-        identifySwipeRefreshParents();
+            identifySwipeRefreshParents();
 
-        checkCustomScrolling();
+            checkCustomScrolling();
 
-        for(int i = 0; i < onAttach.size(); i++) {
-            onAttach.get(i).run();
+            for (int i = 0; i < onAttach.size(); i++) {
+                onAttach.get(i).run();
+            }
+
+            //Hides the view
+            TranslateAnimation anim = new TranslateAnimation(
+                    Animation.RELATIVE_TO_PARENT, 0.0f,
+                    Animation.RELATIVE_TO_SELF, rtl ? -getHideRatio() : getHideRatio(),
+                    Animation.RELATIVE_TO_PARENT, 0.0f,
+                    Animation.RELATIVE_TO_PARENT, 0.0f);
+            anim.setDuration(0);
+            anim.setFillAfter(true);
+            hidden = true;
+            startAnimation(anim);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        //Hides the view
-        TranslateAnimation anim = new TranslateAnimation(
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_SELF, rtl ? -getHideRatio() : getHideRatio(),
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f);
-        anim.setDuration(0);
-        anim.setFillAfter(true);
-        hidden = true;
-        startAnimation(anim);
     }
 
     //Identifies any SwipeRefreshLayout parent so that it can be disabled and enabled during scrolling.
